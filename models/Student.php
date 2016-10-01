@@ -4,7 +4,7 @@ namespace models;
 use lib\Core;
 use PDO;
 
-class AcYear {
+class Student {
 
 	protected $core;
 
@@ -12,13 +12,11 @@ class AcYear {
 		$this->core = Core::getInstance();
 	}
 	
-	// Get all years
-	public function getAllYears() {
+	// Get all students
+	public function getAllStudents() {
 		$r = array();		
 
-		$sql = "SELECT  @a:=@a+1 serial_number, id, 
-        name, status FROM acyears ,
-        (SELECT @a:= 0) AS a ORDER BY id DESC";
+		$sql = "SELECT * FROM students ORDER BY id DESC";
 		$stmt = $this->core->dbh->prepare($sql);
 		
 		if ($stmt->execute()) {
@@ -29,16 +27,16 @@ class AcYear {
 		return $r;
 	}
 
-	// Add new years
-	public function addYear($data) {
+	// Add new student
+	public function addStudent($data) {
 		try {
 			if(isset($data['id'])){
 				$id = $data['id'];
 				$name = $data['name'];
 				$status = $data['status'];
-				$sql = "UPDATE acyears SET name='$name', status='$status' WHERE id='$id'";	
+				$sql = "UPDATE classes SET name='$name', status='$status' WHERE id='$id'";	
 			}else{
-				$sql = "INSERT INTO acyears (name, status, created_by, created_at) 
+				$sql = "INSERT INTO classes (name, status, created_by, created_at) 
 					VALUES (:name, :status, :created_by, :created_at)";	
 			}
 			$stmt = $this->core->dbh->prepare($sql);
@@ -53,9 +51,9 @@ class AcYear {
 		
 	}
 
-    // Delete years
-	public function deleteYear($id) {
-		$sql = "DELETE FROM acyears WHERE id IN ($id)";
+    // Delete class
+	public function deleteClass($id) {
+		$sql = "DELETE FROM classes WHERE id = '$id'";
 		$stmt = $this->core->dbh->prepare($sql);
 		
 		if ($stmt->execute()) {
@@ -66,9 +64,9 @@ class AcYear {
 		return $r;
 	}
 
-	// Get year by id
-	public function getYearById($id) {
-		$sql = "SELECT * FROM acyears WHERE id = '$id'";
+	// Get class by id
+	public function getClassById($id) {
+		$sql = "SELECT * FROM classes WHERE id = '$id'";
 		$stmt = $this->core->dbh->prepare($sql);
 		
 		if ($stmt->execute()) {

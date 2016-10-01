@@ -4,7 +4,7 @@ namespace models;
 use lib\Core;
 use PDO;
 
-class AcYear {
+class Section {
 
 	protected $core;
 
@@ -12,13 +12,11 @@ class AcYear {
 		$this->core = Core::getInstance();
 	}
 	
-	// Get all years
-	public function getAllYears() {
+	// Get all sections
+	public function getAllSections() {
 		$r = array();		
 
-		$sql = "SELECT  @a:=@a+1 serial_number, id, 
-        name, status FROM acyears ,
-        (SELECT @a:= 0) AS a ORDER BY id DESC";
+		$sql = "SELECT class_sections.*, classes.name FROM class_sections LEFT OUTER JOIN classes ON class_sections.class_id=classes.id ORDER BY class_sections.id DESC";
 		$stmt = $this->core->dbh->prepare($sql);
 		
 		if ($stmt->execute()) {
@@ -29,17 +27,18 @@ class AcYear {
 		return $r;
 	}
 
-	// Add new years
-	public function addYear($data) {
+	// Add new section
+	public function addSection($data) {
 		try {
 			if(isset($data['id'])){
 				$id = $data['id'];
-				$name = $data['name'];
+				$class = $data['class_id'];
+				$section = $data['section'];
 				$status = $data['status'];
-				$sql = "UPDATE acyears SET name='$name', status='$status' WHERE id='$id'";	
+				$sql = "UPDATE class_sections SET class_id='$class', section='$section', status='$status' WHERE id='$id'";	
 			}else{
-				$sql = "INSERT INTO acyears (name, status, created_by, created_at) 
-					VALUES (:name, :status, :created_by, :created_at)";	
+				$sql = "INSERT INTO class_sections (class_id, section, status, created_by, created_at) 
+					VALUES (:class_id, :section, :status, :created_by, :created_at)";	
 			}
 			$stmt = $this->core->dbh->prepare($sql);
 			if ($stmt->execute($data)) {
@@ -53,9 +52,9 @@ class AcYear {
 		
 	}
 
-    // Delete years
-	public function deleteYear($id) {
-		$sql = "DELETE FROM acyears WHERE id IN ($id)";
+    // Delete section
+	public function deleteSection($id) {
+		$sql = "DELETE FROM class_sections WHERE id IN ($id)";
 		$stmt = $this->core->dbh->prepare($sql);
 		
 		if ($stmt->execute()) {
@@ -66,9 +65,9 @@ class AcYear {
 		return $r;
 	}
 
-	// Get year by id
-	public function getYearById($id) {
-		$sql = "SELECT * FROM acyears WHERE id = '$id'";
+	// Get section by id
+	public function getSectionById($id) {
+		$sql = "SELECT * FROM class_sections WHERE id = '$id'";
 		$stmt = $this->core->dbh->prepare($sql);
 		
 		if ($stmt->execute()) {

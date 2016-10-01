@@ -55,7 +55,7 @@ class Department {
 
     // Delete department
 	public function deleteDepartment($id) {
-		$sql = "DELETE FROM departments WHERE id = '$id'";
+		$sql = "DELETE FROM departments WHERE id IN ($id)";
 		$stmt = $this->core->dbh->prepare($sql);
 		
 		if ($stmt->execute()) {

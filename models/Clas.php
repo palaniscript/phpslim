@@ -4,7 +4,7 @@ namespace models;
 use lib\Core;
 use PDO;
 
-class Class {
+class Clas {
 
 	protected $core;
 
@@ -17,7 +17,7 @@ class Class {
 		$r = array();		
 
 		$sql = "SELECT  @a:=@a+1 serial_number, id, 
-        class, section, status FROM class_sections ,
+        name, status FROM classes ,
         (SELECT @a:= 0) AS a ORDER BY id DESC";
 		$stmt = $this->core->dbh->prepare($sql);
 		
@@ -34,12 +34,12 @@ class Class {
 		try {
 			if(isset($data['id'])){
 				$id = $data['id'];
-				$class = $data['class'];
-				$section = $data['section'];
-				$sql = "UPDATE class_sections SET class='$class', section='$section' WHERE id='$id'";	
+				$name = $data['name'];
+				$status = $data['status'];
+				$sql = "UPDATE classes SET name='$name', status='$status' WHERE id='$id'";	
 			}else{
-				$sql = "INSERT INTO class_sections (class, section, status, created_by, created_at) 
-					VALUES (:name, :section, :status, :created_by, :created_at)";	
+				$sql = "INSERT INTO classes (name, status, created_by, created_at) 
+					VALUES (:name, :status, :created_by, :created_at)";	
 			}
 			$stmt = $this->core->dbh->prepare($sql);
 			if ($stmt->execute($data)) {
@@ -53,9 +53,9 @@ class Class {
 		
 	}
 
-    // Delete Class
-	public function deleteType($id) {
-		$sql = "DELETE FROM class_sections WHERE id = '$id'";
+    // Delete class
+	public function deleteClass($id) {
+		$sql = "DELETE FROM classes WHERE id IN ($id)";
 		$stmt = $this->core->dbh->prepare($sql);
 		
 		if ($stmt->execute()) {
@@ -67,8 +67,8 @@ class Class {
 	}
 
 	// Get class by id
-	public function getTypeById($id) {
-		$sql = "SELECT * FROM class_sections WHERE id = '$id'";
+	public function getClassById($id) {
+		$sql = "SELECT * FROM classes WHERE id = '$id'";
 		$stmt = $this->core->dbh->prepare($sql);
 		
 		if ($stmt->execute()) {
