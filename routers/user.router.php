@@ -1,64 +1,53 @@
 <?php
+$url = '/users';
 
-// Get user
-$app->get('/user', function () use ($app) {	
-	
-	$oLaboratory = new models\User();
-	$users = $oLaboratory->getUsers();
+// Get single record
+$app->get($url . '/:id', function ($id) use ($app) {
+	$oStuff = new models\User();
+	$response = $oStuff->getRecord($id);
 	$app->contentType('application/json');
-	echo json_encode($users);
+	echo json_encode($response);
 });
 
-//Create user
-$app->post('/user', function () use ($app) {	
-	//var_dump($app->request()->post('data'));
-	$user = json_decode($app->request()->post('data'), true);	
-	$user['password'] = hash("sha1", $user['password']);	
-	$oUser = new User ();
-	echo $oUser->insertUser($user);
+// PUT route
+$app->post('/update-password', function () use ($app) {
+	$data = json_decode($app->request->getBody(), true);	
+	$oStuff = new models\User();
+	echo $oStuff->updatePassword($data);
 });
 
 // LOGIN GET user by email and passwordS
-$app->post('/login', function () use ($app) {
+$app->post('/authentication', function () use ($app) {
 	$data = json_decode($app->request->getbody(),true);
 	
-	$email = $data['email'];
-	$pass = md5($data['password']);
+	$mobile = $data['mobile'];
+	$pass = $data['passcode'];
 
 	$oUser = new models\User();
 
-	echo json_encode($oUser->getUserByLogin($email, $pass), true);
+	return $oUser->getUserByLogin($mobile, $pass, $app);
 });
 
-// LOGIN GET user by email and passwordS
+// LOGIN GET user by session
+$app->post('/loginBySession', function () use ($app) {
+	$data = json_decode($app->request->getbody(),true);
+	
+	$token = $data['token'];
+	$oUser = new models\User();
+
+	if($oUser->authenticateSession($token)){
+		echo json_encode($oUser->getUserById($data["id"]), true);
+	}else{
+		echo json_encode($oUser->authenticateSession($token), true);	
+	}
+});
+
+// LOGIN GET user by mobile and passwordS
 $app->post('/logout', function () use ($app) {
 	$data = json_decode($app->request->getbody(),true);
 	
-	$email = $data['email'];
+	$mobile = $data['mobile'];
 
 	$oUser = new models\User();
-	echo json_encode($oUser->logoutUser($email), true);
-});
-
-
-// PUT route
-$app->put('/user', function () use ($app) {
-	$data = json_decode($app->request->getbody(),true);
-	
-	$id = $data['id'];
-	$currentPassword = md5($data['currentPassword']);
-	$newPassword = md5($data['newPassword']);
-
-	$oUser = new models\User();
-	if($oUser->checkCurrentPassword($id, $currentPassword)){
-		echo json_encode($oUser->updatePassword($id, $newPassword), true);	
-	}else{
-		echo "invalid-old-password";
-	}
-	
-});
-
-// DELETE route
-$app->delete('/user', function () {
-    echo 'This is a DELETE route';
+	echo json_encode($oUser->logoutUser($mobile), true);
 });
